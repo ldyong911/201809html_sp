@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script>
+	//웹소켓 변수
+	var webSocket;
+	
 	//테트리스 화면을 3개로 구성
 	//블럭화면, 쌓이는화면, 출력화면
 	var arr2d_block = new Array();
@@ -13,11 +16,18 @@
 	//캔버스 그리는법
 	var canvas;
 	var ctx;
+	var canvas_other; //다른유저의 캔버스
+	var ctx_other;
 	window.onload = function() {
 		init_arr();
 		canvas = document.getElementById("canvas");
 		if (canvas == null || canvas.getContext == null) return;
 		ctx = canvas.getContext("2d");
+		
+		canvas_other = document.getElementsByName("canvas_other")[0];
+		if (canvas_other == null || canvas_other.getContext == null) return;
+		ctx_other = canvas_other.getContext("2d");
+		
 		draw();
 	}
 	
@@ -46,10 +56,6 @@
 		arr2d_stack[19][6] = 2;
 		arr2d_stack[19][7] = 2;
 		
-		console.log(arr2d_block);
-		console.log(arr2d_stack);
-		console.log(arr2d_displ);
-		
 	}
 	
 	//색깔
@@ -63,6 +69,11 @@
 	
 	//그림그리기
 	function draw() {
+		console.log(webSocket);
+		if(webSocket != undefined){
+			send();
+		}
+		
 		for(var i=0; i<20; i++){
 			for(var j=0; j<10; j++){
 				var index_color = arr2d_displ[i][j];
@@ -72,13 +83,71 @@
 		}
 	}
 	
+	//다른유저의 그림그리기
+	function draw_other(info) {
+		var arr_info = info.split(":");
+		var name_other = arr_info[0];
+		var displ_other = arr_info[1];
+		
+		for(var i=0; i<20; i++){
+			for(var j=0; j<10; j++){
+				var index_color = displ_other.substring((i*10+j), (i*10+j)+1);
+				ctx_other.fillStyle = color[index_color];
+				ctx_other.fillRect(j*8, i*8, 7, 7); // j는 가로, i는 세로
+			}
+		}
+	}
+	
 	function fn_keyboard(e){
 		fn_move(e.keyCode);
 	}
 	
-	//일정시간마다 내려오게
 	function fn_start(){
+		var my_initial = document.getElementById("my_initial").value;
+		
+		if(my_initial.length < 3){
+			return;
+		}
+		
+		//웹소켓
+		webSocket = new WebSocket('ws://192.168.206.225/GAMESOCKET/omok');
+		
+		webSocket.onerror = function(event) {
+			onError(event)
+		};
+		webSocket.onopen = function(event) {
+			onOpen(event)
+		};
+		webSocket.onmessage = function(event) {
+			onMessage(event)
+		};
+		
+		//일정시간마다 내려오게
 		setInterval("fn_move(40)", 500);
+	}
+	
+	//웹소켓
+	function onMessage(event) {
+		console.log(event.data);
+		draw_other(event.data);
+	}
+	function onOpen(event) {
+		console.log("success: " + event);
+	}
+	function onError(event) {
+		console.log("error: " + event);
+	}
+	function send() {
+		var initial = document.getElementById("my_initial").value;
+		var str_arr = "";
+		
+		for(var i=0; i<arr2d_displ.length; i++){
+			for(var j=0; j<arr2d_displ[i].length; j++){
+				str_arr += arr2d_displ[i][j];
+			}
+		}
+		
+		webSocket.send(initial + ":" + str_arr);
 	}
 	
 	//키이벤트
@@ -93,9 +162,11 @@
 		//32 space, 38 up, 40 down, 37 left, 39 right
 		if(keycode == 40){
 			block_i++;
-		}else if(keycode == 37){
+		}
+		if(keycode == 37){
 			block_j--;
-		}else if(keycode == 39){
+		}
+		if(keycode == 39){
 			block_j++;
 		}
 		
@@ -130,7 +201,7 @@
 				
 				block_type = rand;
 				block_status = 1;
-				block_i = 0;
+				block_i = 1;
 				block_j = 4;
 				setBlock();
 				
@@ -143,8 +214,6 @@
 		setDispl();
 		
 		draw();
-		
-		console.log(arr2d_displ);
 	}
 	
 	//한줄이 다차면 제거
@@ -167,11 +236,11 @@
 		var count_refill = arr2d_displ.length - arr_temp.length;
 		
 		//없앤 횟수 카운트
-		var obj_div = document.getElementById("my_count");
-		var my_count = parseInt(obj_div.innerHTML);
+		var obj_my_count = document.getElementById("my_count");
+		var my_count = parseInt(obj_my_count.innerHTML);
 		
 		my_count = my_count - count_refill;
-		obj_div.innerHTML = my_count;
+		obj_my_count.innerHTML = my_count;
 		
 		if(my_count <= 0){
 			alert("Mission Complete");
@@ -184,8 +253,6 @@
 		}
 		
 		arr2d_stack = arr_refill.concat(arr_temp);
-		
-		console.log(count_refill);
 	}
 	
 	//블럭을 쌓이는화면에 쌓이게
@@ -194,7 +261,6 @@
 			for(var j=0; j<arr2d_displ[i].length; j++){
 				if(arr2d_block[i][j] != 0){
 					arr2d_stack[i][j] = arr2d_block[i][j];
-					
 				}
 			}
 		}
@@ -222,7 +288,7 @@
 		var count_in=0;
 		for(var i=0; i<arr2d_block.length; i++){
 			for(var j=0; j<arr2d_block[i].length; j++){
-				if(arr2d_block[i][j] > 0){
+				if(arr2d_block[i][j] != 0){
 					count_in++;
 				}
 			}
@@ -400,10 +466,168 @@
 </script>
 </head>
 <body onkeydown="fn_keyboard(event)">
+	<input id="my_initial" maxlength="3"/>
 	<div id="my_start" onclick="fn_start()">start</div>
 	<div id="my_count">10</div>
-	<canvas id="canvas" width="400" height="700">
-		이 브라우저는 캔버스를 지원하지 않습니다.
-	</canvas>
+	
+	<table border="1">
+		<tr>
+			<td rowspan="4">
+				<canvas id="canvas" width="400" height="500">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+			<td>
+				<div name="div_other"></div>
+				<canvas name="canvas_other" width="80" height="160">
+					이 브라우저는 캔버스를 지원하지 않습니다.
+				</canvas>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

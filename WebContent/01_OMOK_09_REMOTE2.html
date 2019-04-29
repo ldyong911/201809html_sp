@@ -12,6 +12,7 @@
 		display:block;
 	}
 </style>
+<script src="jquery-1.12.4.js"></script>
 <script type="text/javascript">
 	var arr2D = new Array();
 	var arr2Dimg = new Array();
@@ -56,7 +57,6 @@
 				arr2Dimg[i][j].alt = i + "," + j;
 			}
 		}
-		
 	}
 	
 	//화면출력
@@ -68,7 +68,51 @@
 		}
 	}
 	
+	var arrHistory = new Array();
 	var status = 1; //흑돌상태
+	
+	function fn_keepMemory(){
+		var str = "";
+		
+		for(var i=0; i<arr2D.length; i++){
+			for(var j=0; j<arr2D[i].length; j++){
+				str += arr2D[i][j];
+			}
+		}
+		
+		arrHistory.push(str);
+	}
+	
+	function fn_save(){
+		var historys = "";
+		var winner = "";
+		
+		historys = arrHistory+"";
+		winner = status;
+		
+		console.log(historys);
+		console.log(winner);
+		
+		$.ajax({
+			type : "post",
+			url : "myomok",
+			data : {historys: historys,
+					winner: winner},
+			dataType : "json",
+
+			success : function(data) {
+				console.log(data.message);
+			},
+
+			error : function(xhr, status, error) {
+				console.log("에러!: " + error);
+			},
+
+		});
+	}
+	
+	var ai_i = -1;
+	var ai_j = -1;
 	
 	//클릭했을때
 	function myClick(obj){
@@ -77,18 +121,39 @@
 			return;
 		}
 		
-		var str_alt = obj.alt;
-		var arr_alt = str_alt.split(",");
-		var i = Number(arr_alt[0]);
-		var j = Number(arr_alt[1]);
-		
-		if(arr2D[i][j] != 0){
-			alert("임마");
-			return;
+		var history = "";
+		for(var i=0; i<arr2D.length; i++){
+			for(var j=0; j<arr2D[i].length; j++){
+				history += arr2D[i][j];
+			}
 		}
 		
+		$.ajax({
+			type : "get",
+			url : "http://localhost/GAMESOCKET/myremote_jsonp",
+			data : {history: history,
+					status: status},
+			dataType : "jsonp",
+			jsonpCallback : "myCallback",
+			async: false, //비동기예제(비동기는 각각의 다른 작업들을 알아서 처리/동기는 하나의 작업이 끝난후 다음작업 처리)
+	
+			success : function(data) {
+				console.log("=====================================");
+				ai_i = data[0].i;
+				ai_j = data[0].j;
+				console.log(data[0].i);
+				console.log(data[0].j);
+				console.log("=====================================");
+			},
+	
+			error : function(xhr, status, error) {
+				console.log("에러!: " + error);
+			},
+		});
+		
 		//유저
-		arr2D[i][j] = status; //맨처음 흑돌넣기위해 흑돌상태 세팅
+		arr2D[ai_i][ai_j] = status; //맨처음 흑돌넣기위해 흑돌상태 세팅
+		fn_keepMemory();
 		myDisplay();
 		
 		//바둑돌 놓인개수 체크
@@ -113,9 +178,9 @@
 		for(var i=0; i<arr_cnt.length; i++){
 			if(arr_cnt[i] == 5){
 				if(status == 1){
+					fn_save();
 					alert("흑돌이 이겼습니다.");
 				}
-				status = 0; //끝나면 돌이 안놓아지는 상태로 놓음
 				return;
 			}
 		}
@@ -126,15 +191,39 @@
 		}
 		
 		//==================================================
+			
+		history = "";
+		for(var i=0; i<arr2D.length; i++){
+			for(var j=0; j<arr2D[i].length; j++){
+				history += arr2D[i][j];
+			}
+		}
 		
-		//컴퓨터
-		var arr_return = [-1,-1];
-		fn_setStoneByCom(arr_return);
-		console.log(arr_return);
+		$.ajax({
+			type : "get",
+			url : "http://localhost/GAMESOCKET/myremote_jsonp",
+			data : {history: history,
+					status: status},
+			dataType : "jsonp",
+			jsonpCallback : "myCallback",
+			async: false, //비동기예제(비동기는 각각의 다른 작업들을 알아서 처리/동기는 하나의 작업이 끝난후 다음작업 처리)
+	
+			success : function(data) {
+				console.log("=====================================");
+				ai_i = data[0].i;
+				ai_j = data[0].j;
+				console.log(data[0].i);
+				console.log(data[0].j);
+				console.log("=====================================");
+			},
+	
+			error : function(xhr, status, error) {
+				console.log("에러!: " + error);
+			},
+		});
 		
-		var ai_i = arr_return[0];
-		var ai_j = arr_return[1];
 		arr2D[ai_i][ai_j] = status;
+		fn_keepMemory();
 		myDisplay();
 		
 		//바둑돌 놓인개수 체크
@@ -159,9 +248,9 @@
 		for(var i=0; i<arr_cnt.length; i++){
 			if(arr_cnt[i] == 5){
 				if(status == 2){
+					fn_save();
 					alert("백돌이 이겼습니다.");
 				}
-				status = 0; //끝나면 돌이 안놓아지는 상태로 놓음
 				return;
 			}
 		}
@@ -171,21 +260,6 @@
 			status = 1;
 		}
 		
-	}
-	
-	//컴퓨터가 판단
-	function fn_setStoneByCom(arr_ref){
-		for(var i=0; i<arr2D.length; i++){
-			for(var j=0; j<arr2D[i].length; j++){
-				if(arr2D[i][j] == 0){
-					arr_ref[0] = i;
-					arr_ref[1] = j;
-					return;
-				}
-			}
-		}
-		
-		console.log(empty_i + " : " + empty_j);
 	}
 	
 	function fn_top(i,j){

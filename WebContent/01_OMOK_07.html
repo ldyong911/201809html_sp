@@ -102,7 +102,6 @@
 
 			success : function(data) {
 				console.log(data.message);
-				alert(data.message);
 			},
 
 			error : function(xhr, status, error) {
@@ -219,8 +218,17 @@
 		
 	}
 	
+	var arr2Dmemory = new Array();
+	
 	//컴퓨터가 판단
 	function fn_setStoneByCom(arr_ref){
+		var history = "";
+		for(var i=0; i<arr2D.length; i++){
+			for(var j=0; j<arr2D[i].length; j++){
+				history += arr2D[i][j];
+			}
+		}
+		
 		var arr2Dattack = new Array();
 		var arr2Ddefense = new Array();
 		var arr2Dcenter = new Array();
@@ -233,17 +241,50 @@
 			var arr_row_d = new Array();
 			var arr_row_c = new Array();
 			var arr_row_s = new Array();
+			var arr_row_m = new Array();
 			for(var j=0; j<arr2D[i].length; j++){
 				arr_row_a.push(0);
 				arr_row_d.push(0);
 				arr_row_c.push(0);
 				arr_row_s.push(0);
+				arr_row_m.push(0);
 			}
 			arr2Dattack.push(arr_row_a);
 			arr2Ddefense.push(arr_row_d);
 			arr2Dcenter.push(arr_row_c);
 			arr2Dsumall.push(arr_row_s);
+			arr2Dmemory.push(arr_row_m);
 		}
+		
+		$.ajax({
+			type : "get",
+			url : "myasync",
+			data : {history: history,
+					status: status},
+			dataType : "json",
+			async: false, //비동기예제(비동기는 각각의 다른 작업들을 알아서 처리/동기는 하나의 작업이 끝난후 다음작업 처리)
+	
+			success : function(data) {
+				//이전의 기보가 있으면 이겼는지 졌는지 판단하여 가중치 부여
+				for(var i=0; i<data.length; i++){
+					var ii = parseInt(data[i].i);
+					var jj = parseInt(data[i].j);
+					
+					if(status == data[i].status){
+						arr2Dmemory[ii][jj] = arr2Dmemory[ii][jj]+0.1;
+					}else{
+						arr2Dmemory[ii][jj] = arr2Dmemory[ii][jj]-0.1;
+					}
+				}
+				console.log("=====================================");
+				console.log(data);
+				console.log("=====================================");
+			},
+	
+			error : function(xhr, status, error) {
+				console.log("에러!: " + error);
+			},
+		});
 		
 		//가운데값 판단 가중치
 		for(var i=0; i<arr2D.length; i++){
@@ -330,10 +371,11 @@
 		//모든값 가중치 더하기
 		for(var i=0; i<arr2D.length; i++){
 			for(var j=0; j<arr2D[i].length; j++){
-				arr2Dsumall[i][j] = arr2Dattack[i][j] + arr2Ddefense[i][j] + arr2Dcenter[i][j];
+				arr2Dsumall[i][j] = arr2Dattack[i][j] + arr2Ddefense[i][j] + arr2Dcenter[i][j] + arr2Dmemory[i][j];
 			}
 		}
 		
+		//빈곳 찾기
 		for(var i=0; i<arr2Dsumall.length; i++){
 			for(var j=0; j<arr2Dsumall[i].length; j++){
 				if(arr2D[i][j] != 0){
@@ -342,6 +384,7 @@
 			}
 		}
 		
+		//가중치가 제일 높은곳 찾기
 		var max_all = 0;
 		for(var i=0; i<arr2Dsumall.length; i++){
 			for(var j=0; j<arr2Dsumall[i].length; j++){
@@ -353,6 +396,7 @@
 		
 		console.log(max_all);
 		
+		//가중치가 제일 높은곳의 i와 j값 구하기
 		for(var i=0; i<arr2Dsumall.length; i++){
 			for(var j=0; j<arr2Dsumall[i].length; j++){
 				if(arr2Dsumall[i][j] == max_all){

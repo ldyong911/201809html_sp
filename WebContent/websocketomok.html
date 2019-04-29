@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+	var webSocket;
+	
+	function init(){
+		webSocket = new WebSocket('ws://192.168.206.225/GAMESOCKET/omok');
+		
+		webSocket.onerror = function(event) {
+			onError(event)
+		};
+		webSocket.onopen = function(event) {
+			onOpen(event)
+		};
+		webSocket.onmessage = function(event) {
+			onMessage(event)
+		};
+	}
+	
+	function onMessage(event) {
+		console.log(event.data);
+		textarea.value += "상대 : " + event.data + "\n";
+	}
+	function onOpen(event) {
+		console.log("success: " + event);
+	}
+	function onError(event) {
+		console.log("error: " + event);
+	}
+	function send() {
+		webSocket.send("메세지 테스트~~~~");
+	}
+</script>
+</head>
+<body onload="init()">
+	<a href="javascript:send()">send</a>
+</body>
+</html>
