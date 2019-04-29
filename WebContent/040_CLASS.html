@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title> 
+		<script src="jquery-1.12.4.js">
+		//위에 src가 없으면 JQuery 문법이 동작하지 않음(import와 같은 의미)(네트워크에 영향을 받지 않음. 내서버에 js 파일이 있기 때문에)
+		</script>
+		
+		<script type="text/javascript">
+			function myclick(){
+// 				var txt = $(".my_txt").val();
+// 				alert(txt);
+				
+// 				$(".my_txt").val("홍길동");
+				
+// 				$(".my_div").html("홍길동");
+// 				$(".my_div:eq(2)").css("color", "red"); //:eq(index)는 배열과 같은 값일때 index에 해당하는 값을 가져옴
+				$(".my_div:lt(0)").html("이순신"); //lt(index)는 index보다 작은것
+				$(".my_div:gt(0)").html("이순신"); //gt(index)는 index보다 큰것
+				console.log($(".my_div:gt(1)").html());
+			}
+		</script>
+	</head>
+	<body>
+		<input type="text" class="my_txt"/>
+		<input type="button" onclick="myclick()" value="클릭"/>
+		
+		<div class="my_div">6</div>
+		<div class="my_div">7</div>
+		<div class="my_div">8</div>
+	</body>
+</html>

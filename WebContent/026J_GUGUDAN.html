@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script src="jquery-1.12.4.js">
+		</script>
+		<script type="text/javascript">
+			function myclick(){
+// 				var obj = document.getElementsByName("mySelect")[0];
+// 				var dan = obj.options[obj.selectedIndex].value;
+				
+// 				for(var i=1; i<=9; i++){
+// 					document.write(dan + "*" + i + "=" + (dan*i) +"<br>");
+// 					//document.write(obj.selectedIndex+2 + "*" + i + "=" + ((obj.selectedIndex+2)*i) +"<br>");
+//  					//document.write(obj.value + "*" + i + "=" + (obj.value*i) +"<br>");
+// 				}
+				
+				var dan = $("select[name=mySelect]").val();
+// 				var dan = $("#mySelect").val();
+				$("#my_body").html("");
+				for(var i=1; i<=9; i++){
+					$("#my_body").append(dan + "*" + i + "=" + (dan*i) +"<br>");
+				}
+			}
+		</script>
+	</head>
+	<body id="my_body">
+		<select name="mySelect" id="mySelect">
+			<option value="2">2단</option>
+			<option value="3">3단</option>
+			<option value="4">4단</option>
+			<option value="5">5단</option>
+			<option value="6">6단</option>
+			<option value="7">7단</option>
+			<option value="8">8단</option>
+			<option value="9">9단</option>
+		</select>
+
+		<input type="button" value="클릭" onclick="myclick()"/>
+	</body>
+</html>

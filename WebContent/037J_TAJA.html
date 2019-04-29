@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script src="jquery-1.12.4.js">
+		</script>
+		<style type="text/css">
+		#my_text{
+			position: absolute;
+			top: 500px;
+			left: 0px;
+		}
+		a{
+			position: absolute;
+			top: 500px;
+			left: 200px;
+		}
+		.div_word{
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			background-color: #17D4FE;
+		}
+		</style>
+		
+		<script type="text/javascript">
+			var idx_time = 0; //setInterval 저장변수
+			var score = 0;
+		
+			function gamestart(){
+				idx_time = setInterval(onestep_down, 50); //function(){onestep_down();}을 onstep_down으로 줄일 수 있다.
+			}
+			
+			function onestep_down(){
+// 				var div_words = document.getElementsByClassName("div_word");
+				var div_words = $(".div_word");
+
+				for(var i=0; i<div_words.length; i++){
+// 					var str_top = div_words[i].style.top; //i번째 div의 style속성에 top 가져오기
+					var str_top = $(div_words[i]).offset().top; //JQuery문법으로 offset()은 style의 속성을 자동으로 int형으로 가지고 온다 
+					
+					var int_top = Number(str_top); //px를 없앤 문자를 숫자형태로 바꾸기
+					int_top += 5; //계속 더해주기
+					
+					if(int_top > 480){ //제한범위을 넘어가면
+						alert("당신이 졌습니다.");
+						clearInterval(idx_time); //setInterval 멈추기
+						break; //for문 탈출
+					}
+					
+// 					div_words[i].style.top = int_top+"px"; //i번째 div의 style속성에 top을 다시 증가된값px 넣어주기
+					$(div_words[i]).css("top", int_top); //JQuery문법으로 top에 해당하는 값을 int_top으로 바꿔준다 
+				}
+			}
+			
+			function fn_press(e){
+				if (e.keyCode == 13) { //엔터키는 코드값 13
+		            // 엔터키가 눌렸을 때 실행할 내용
+					fn_compare();
+		        }
+			}
+			
+			function fn_compare(){
+// 				var str_text = document.getElementById("my_text").value;
+// 				var div_words = document.getElementsByClassName("div_word");
+				var str_text = $("#my_text").val();
+				var div_words = $(".div_word");
+				
+// 				console.log(div_words[0].innerHTML) //innerHTML은 id에 해당하는 태그, 텍스트 등 모두 가져온다
+// 				console.log(div_words[0].innerText) //innerText는 value값 즉 텍스트만 가져온다
+				
+				for(var i=div_words.length-1; i>=0; i--){ //stack구조이기 때문에 앞에서부터 지우면 삭제되고나서 뒤에있던 자료가 앞으로 옮겨지기때문에
+														  //뒤에서부터 지워야 자료구조 변동을 막을 수 있다.
+// 					var str_compare = div_words[i].innerHTML;
+					var str_compare = $(div_words[i]).html(); //JQuery문법으로 객체를 넣을땐 "" 제거
+					if(str_text == str_compare){
+// 						div_words[i].remove(); //i번째 div를 제거하기
+						$(div_words[i]).remove(); //JQuery문법으로 remove()는 동일
+						score++; //내가 맞춘개수
+						if(score >= 3){ //맞춘개수가 2개이상이면
+							alert("당신이 이겼습니다.");
+							clearInterval(idx_time); //setInterval 멈추기
+						}
+						break; //같은 단어가 여러개일경우 1개만 지워주기 위해 for문을 탈출
+					}
+				}
+				
+// 				document.getElementById("my_text").value = ""; //입력하고나서 다시 빈칸으로 만들어주기
+				$("#my_text").val("");
+			}
+		</script>
+	</head>
+	<body onload="gamestart()">
+		<input type="text" id="my_text" onkeypress="fn_press(event)"/>
+		<a href="javascript:gamestart()">시작</a> <br>
+		
+		<div class="div_word" style="top: 0px">우리나라</div>
+		<div class="div_word" style="top: 0px; left: 100px">우리나라</div>
+		<div class="div_word" style="top: 0px; left: 200px">우리나라</div>
+	</body>
+</html>

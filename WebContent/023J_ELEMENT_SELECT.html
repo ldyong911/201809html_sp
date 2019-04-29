@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script src="jquery-1.12.4.js">
+		</script>
+		<script type="text/javascript">
+			function myclick(){
+				//var obj = document.getElementById("mySelect");
+				//alert(obj.options[obj.selectedIndex].text)
+				
+// 				var obj = document.getElementsByName("mySelect")[0];
+// 				alert(obj.options[obj.selectedIndex].value);
+				
+				var str_sel = $("select[name=mySelect]").val();
+				alert(str_sel);
+				
+				$("select[name=mySelect]").val("3"); //selected 옵션을 원하는 값으로 바꾸기
+// 				$("select[name=mySelect] option:eq(2)").attr("selected", true); //selected 옵션을 원하는 값으로 바꾸기
+			}
+		</script>
+	</head>
+	<body>
+
+		<select id="select1" name="mySelect">
+			<option value="1">111</option>
+			<option value="2" selected>222</option>
+			<option value="3">333</option>
+		</select>
+		
+		<input type="button" value="클릭" onclick="myclick()"/>
+	</body>
+</html>

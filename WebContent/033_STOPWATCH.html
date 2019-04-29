@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<style type="text/css">
+		body{
+			background-color: black;
+		}
+		#mydiv{
+			position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    transform: translateX(-50%) translateY(-50%);
+		    color: #17D4FE;
+		    font-size: 60px;
+		    font-family: Orbitron;
+		    letter-spacing: 7px;
+		}
+		a{
+			font-size: 40px;
+			color: #17D4FE;
+		}
+		</style>
+		<script type="text/javascript">
+			var timerId = 0; //setInterval을 저장할 변수
+			var startTime = 0; //처음 스타트를 누른시점을 저장하기 위해
+			
+			function myclick(){
+				var now = new Date();
+				startTime = now.getTime(); //스타트 누른시점 저장
+				
+				//인간이 1초에 볼수있는 프레임수는 30, 자연스럽게 보이기위해서는 60
+				timerId = setInterval(function(){ //clearInterval을 사용하기위해 setInterval을 저장
+										         test();
+									            }, 20);
+			}
+			function test(){
+				var now = new Date();
+				var ellapsed = now.getTime(); //경과된 시간 저장
+				var between = ellapsed - startTime; //경과된시간에서 스타트시간 차이
+				
+				//소수점버리기위해 parseInt로 정수로 바꾸기
+				var min = parseInt(between / (1000*60));
+				var sec = (parseInt(between / 1000)) % 60; //초는 60이 넘어가면 다시 0으로
+				var mil = 0;
+				mil = between % 1000;
+				
+				var str_min = (100+min)+"";
+				var str_sec = (100+sec)+"";
+				var str_mil = (1000+mil)+"";
+				
+				str_min = str_min.substring(1, 3);
+				str_sec = str_sec.substring(1, 3);
+				str_mil = str_mil.substring(1, 3);
+				
+				var objDiv = document.getElementById("mydiv");
+				objDiv.innerHTML = str_min + ":" + str_sec + ":" + str_mil;
+			}
+			
+			function mystop(){
+				clearInterval(timerId);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="mydiv"></div>
+		<a href="javascript:myclick()">스타트</a>
+		<a href="javascript:mystop()">스탑</a>
+	</body>
+</html>

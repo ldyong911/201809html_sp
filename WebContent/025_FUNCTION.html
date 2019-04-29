@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script type="text/javascript">
+			//javascript는 오버로드의 개념이 없다
+			function myclick(a,b){ //javascript는 모든 변수값들이 var형태이기때문에 타입지정을 하지않는다
+				console.log(a); //console.log는 크롬에서만 정상 동작
+				console.log(b);
+				console.log(a+b);
+			}
+		</script>
+	</head>
+	<body>
+		<input type="button" value="클릭" onclick="myclick('1',this)"/> <!-- this는 onclick을 실행한 객체를 의미 -->
+	</body>
+</html>

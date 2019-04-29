@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title> 
+		
+		<script src="jquery-1.12.4.js">
+		</script>
+		
+		<script type="text/javascript">
+			function myclick(){
+				var str_text = $("input[name=my_text]").val(); //JQuery문법으로 name으로 설정된 값을 가져오는 방법
+				alert(str_text);
+				$("input[name=my_text]").val("자바스크립트");
+			}
+		</script>
+	</head>
+	<body>
+		<input type="text" name="my_text"/>
+		<input type="button" onclick="myclick()" value="클릭"/>
+	</body>
+</html>

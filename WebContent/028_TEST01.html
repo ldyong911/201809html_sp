@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<style type="text/css">
+		#input_a{
+			width: 30px;
+		}
+		#input_b{
+			width: 30px;
+		}
+		#input_c{
+			width: 40px;
+		}
+		#input_btn{
+			width: 157px;
+		}
+		</style>
+		<script type="text/javascript">
+			function myclick(){
+				var a = document.getElementById("input_a").value;
+				var b = document.getElementById("input_b").value;
+				var c = Number(a) + Number(b); //숫자로 바꾸기
+				
+				var objC = document.getElementById("input_c");
+				objC.value = c;
+				
+				//document.getElementById("input_c").value = (a*1)+(b*1); //곱하기1해주면 숫자로 인식
+			}
+		</script>
+	</head>
+	<body>
+		<input type="text" id="input_a" /> +
+		<input type="text" id="input_b" /> =
+		<input type="text" id="input_c" /><br>
+		<input type="button" id="input_btn" onclick="myclick()" value="계산하기"/>
+	</body>
+</html>

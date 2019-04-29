@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script src="jquery-1.12.4.js">
+		</script>
+		<script type="text/javascript">
+			function myclick(){
+// 				alert(document.getElementById("pw").value);
+				
+// 				var arr = document.getElementsByName("sex");
+// 				var str_sex = "";
+				
+// 				for(var i=0; i<arr.length; i++){
+// 					if(arr[i].checked){
+// 						str_sex = arr[i].value;
+// 					}
+// 				}
+// 				alert(str_sex);
+				
+				var str_sex = $("input[name=sex]:checked").val(); //JQuery문법으로 radio타입의 체크된 값 가져오기
+				alert(str_sex);
+				
+// 				var arr2 = document.getElementsByName("age");
+// 				var str_age = "";
+				
+// 				for(var i=0; i<arr2.length; i++){
+// 					if(arr2[i].checked){
+// 						str_age = arr2[i].value;
+// 					}
+// 				}
+// 				alert(str_age+"대");
+				
+				var str_age = $("input[name=age]:checked").val(); //JQuery문법으로 radio타입의 체크된 값 가져오기
+				alert(str_age);
+				
+				$("input[name=sex]:eq(1)").attr("checked", true); //JQuery문법으로 radio타입 체크 변경하기
+				$("input[name=age]:eq(2)").attr("checked", true);
+				
+			}
+		</script>
+	</head>
+	<body>
+		<input type="password" id="pw"/> <br>
+		
+		성별:
+		<input type="radio" name="sex" value="m" checked/>남
+		<input type="radio" name="sex" value="fm"/>여 <br>
+		나이대:
+		<input type="radio" name="age" value="10"/>10대
+		<input type="radio" name="age" value="20" checked/>20대
+		<input type="radio" name="age" value="30"/>30대 <br>
+		
+		<input type="button" value="클릭" onclick="myclick()"/>
+	</body>
+</html>

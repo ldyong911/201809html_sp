@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script type="text/javascript">
+			function myclick(){
+				//setTimeout - 일정 시간 후 한번 실행
+				//clearTimeout - 일정 시간 후 한번 실행하는 것을 중지
+				//setInterval - 일정 시간마다 반복 실행
+				//clearInterval - 일정 시간마다 반복하는 것을 중단
+
+				setInterval(function(){
+										test();
+									   }, 1000); //1초는 1000밀리세컨드
+			}
+			function test(){
+				console.log("hello");
+			}
+		</script>
+	</head>
+	<body>
+		<a href="javascript:myclick()">클릭</a>
+	</body>
+</html>

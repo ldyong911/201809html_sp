@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Document</title>
+		<script type="text/javascript">
+			function myclick(){
+				//var obj = document.getElementById("mySelect");
+				//alert(obj.options[obj.selectedIndex].text)
+				
+				var obj = document.getElementsByName("mySelect")[0]; //0번째 select를 리턴
+				
+				//option은 복수값으로 options[i]는 i번째 value값을 리턴
+				//obj.selectedIndex는 선택된 인덱스로 해당 select인 obj의 선택된 option의 value값을 리턴
+				alert(obj.options[obj.selectedIndex].value);
+			}
+		</script>
+	</head>
+	<body>
+		<!-- select태그는 콤보박스 형태로 선택할 수 있는 타입 -->
+		<!-- select태그는 기본적으로 1개만 선택하며 옵션으로 여러개를 선택할 수 있게 지정가능 -->
+		<select id="select1" name="mySelect" multiple> <!-- multiple은 다중선택 옵션이지만 사용빈도낮음 -->
+			<option value="1">111</option>
+			<option value="2" selected>222</option>
+			<option value="3">333</option>
+		</select>
+		
+		<input type="button" value="클릭" onclick="myclick()"/>
+	</body>
+</html>

@@ -1,0 +1,18 @@
+@CHARSET "UTF-8";
+
+ul{
+	list-style-type: square;
+}
+ol{
+	list-style-type: hangul;
+}
+body{
+	font-size: large;
+}
+
+#my_ul{
+	list-style-type: circle;	
+}
+.my_ol{
+	list-style-type: hiragana;
+}
